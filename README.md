@@ -1,5 +1,12 @@
 # Detecting hand written digits and letters from images.
 
+[![Python 3.12.5](https://img.shields.io/badge/Python-3.12.5-yellow.svg)](http://www.python.org/download/)
+
+## Requirements
+* python
+* python-virtualenv
+* curl
+
 ## Requirements - pip
 * pandas
 * numpy
