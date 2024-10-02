@@ -5,14 +5,17 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+from utils_tf_selectmodel import selectmodel
 
-from utils_main import *
-from utils_selectmodel import selectmodel
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from emnist_maps import emnist_class_mapping_reversed
+
+
 #model = selectmodel("all_v3_batch10000_epoch5.keras")
 model = selectmodel()
 
 # make output dataframe
-df = pd.DataFrame(reversed_class_mapping.items(), columns=["key", "char"])
+df = pd.DataFrame(emnist_class_mapping_reversed.items(), columns=["key", "char"])
 clm = "prediction"
 df[clm] = "0"
 
@@ -25,6 +28,7 @@ if not vc.isOpened():
 # windows
 cv2.namedWindow("preview")
 
+
 def image_filter(frame):
     img1 = cv2.resize(frame, (28, 28))
     img2 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
@@ -35,21 +39,21 @@ def image_filter(frame):
     img4 = np.expand_dims(img3, axis=-1)
     return img4
 
+
 def detect(filtered_image):
     image_array = np.expand_dims(filtered_image, axis=0)
     predictions = model.predict(image_array, verbose=0)
-    value = np.argmax(predictions, axis=1)
-    value_id = value[0]
-    label = reversed_class_mapping[value_id]
+    # value = np.argmax(predictions, axis=1)
+    # value_id = value[0]
+    # label = emnist_class_mapping_reversed[value_id]
     values = predictions[0]
     df[clm] = [pred * 100 for pred in values]
     sorted_df = df.sort_values(by=clm, ascending=False)
-    #print(str(sorted_df.to_string()))
-    sys.stdout.write(f"\033[0;0H")
+    #  print(str(sorted_df.to_string()))
+    sys.stdout.write("\033[0;0H")
     sys.stdout.flush()
     print(sorted_df.head(n=6))
 
-    
 os.system("clear")
 
 i = 0
@@ -67,12 +71,12 @@ while True:
 
     key = cv2.waitKey(1)
 
-    if key == 27: # exit on ESC
+    if key == 27:  # exit on ESC
         print("Closing webcam preview.")
         break
-    elif key == 32: # detect on SPACE
+    elif key == 32:  # detect on SPACE
         detect(procimg)
-    
+
     i += 1
     if i > 20:
         i = 0

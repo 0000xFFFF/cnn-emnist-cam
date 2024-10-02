@@ -6,19 +6,33 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from utils_main import *
+script_dir = os.path.dirname(os.path.realpath(__file__))
+datasets_dir = os.path.join(script_dir, "datasets")
+datasets_gzip_dir = os.path.join(script_dir, "datasets", "gzip")
+
+def makedir(directory_path):
+    if not os.path.exists(directory_path):
+        os.makedirs(directory_path)
+
+
+def d_datasets(file_path):
+    makedir(datasets_dir)
+    return os.path.join(datasets_dir, file_path)
+
 
 def read_emnist_labels(labels_path: str):
     with gzip.open(labels_path, 'rb') as labelsFile:
         labels = np.frombuffer(labelsFile.read(), dtype=np.uint8, offset=8)
     return labels
 
+
 def read_emnist_images(images_path: str, length: int):
     with gzip.open(images_path, 'rb') as imagesFile:
         # Load flat 28x28 px images (784 px), and convert them to 28x28 px
         images = np.frombuffer(imagesFile.read(), dtype=np.uint8, offset=16).reshape(length, 784).reshape(length, 28, 28, 1)
-        images = images.transpose((0, 2, 1, 3)) 
+        images = images.transpose((0, 2, 1, 3))
     return images
+
 
 def read_emnist_mapping(mapping_path: str):
     mapping = {}
@@ -28,6 +42,7 @@ def read_emnist_mapping(mapping_path: str):
             mapping[int(words[0])] = chr(int(words[1]))
     return mapping
 
+
 def read_emnist_labels_mapped(labels_path: str, mapping_path: str):
     labels = read_emnist_labels(labels_path)
     # convert labels to actual mapping
@@ -35,10 +50,12 @@ def read_emnist_labels_mapped(labels_path: str, mapping_path: str):
     labels = np.array([mapping[element] for element in labels])
     return labels, mapping
 
+
 def read_emnist(images_path: str, labels_path: str, mapping_path: str):
     labels, mapping = read_emnist_labels_mapped(labels_path, mapping_path)
     images = read_emnist_images(images_path, len(labels))
     return images, labels, mapping
+
 
 def bytes_human_readable(num, suffix="B"):
     original = num
@@ -47,6 +64,7 @@ def bytes_human_readable(num, suffix="B"):
             return f"{num:3.1f} {unit}{suffix} ({original} bytes)"
         num /= 1024.0
     return f"{num:.1f} Yi{suffix} ({original}) bytes"
+
 
 def dataset_img(images, labels, index, note: str = ""):
     plt.figure()
@@ -57,6 +75,7 @@ def dataset_img(images, labels, index, note: str = ""):
     plt.imshow(images[index].squeeze(), cmap=plt.cm.gray_r)
     plt.axis('off')
     plt.show()
+
 
 def dataset_img2(images, labels, index, index2):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5, 5))
@@ -69,11 +88,12 @@ def dataset_img2(images, labels, index, index2):
     plt.tight_layout()
     plt.show()
 
+
 def dataset_grid(images, startindex, grid_size):
     grid = images[startindex:startindex + grid_size*grid_size]
     fig, axes = plt.subplots(grid_size, grid_size, figsize=(8, 8))
     for i, ax in enumerate(axes.flat):
-        #ax.imshow(grid[i].reshape((28, 28)), cmap='gray')
+        # ax.imshow(grid[i].reshape((28, 28)), cmap='gray')
         ax.imshow(grid[i].reshape((28, 28)), cmap=plt.cm.gray_r)
         ax.axis('off')
     plt.tight_layout(pad=0)
@@ -81,12 +101,10 @@ def dataset_grid(images, startindex, grid_size):
 
 
 def dataset_loadset(set_name, set_type):
-    dataset_dir = "datasets/gzip/"
-    path_images  = os.path.join(dataset_dir, f"emnist-{set_name}-{set_type}-images-idx3-ubyte.gz")
-    path_labels  = os.path.join(dataset_dir, f"emnist-{set_name}-{set_type}-labels-idx1-ubyte.gz")
-    path_mapping = os.path.join(dataset_dir, f"emnist-{set_name}-mapping.txt")
+    path_images  = os.path.join(datasets_gzip_dir, f"emnist-{set_name}-{set_type}-images-idx3-ubyte.gz")
+    path_labels  = os.path.join(datasets_gzip_dir, f"emnist-{set_name}-{set_type}-labels-idx1-ubyte.gz")
+    path_mapping = os.path.join(datasets_gzip_dir, f"emnist-{set_name}-mapping.txt")
     return read_emnist(path_images, path_labels, path_mapping)
-
 
 
 def images_to_md5s(images):
@@ -96,6 +114,7 @@ def images_to_md5s(images):
         md5_hash = hashlib.md5(arr_bytes).hexdigest()
         hashes.append(md5_hash)
     return hashes
+
 
 def find_duplicates(lst):
     seen = {}
@@ -116,6 +135,7 @@ def dupes_check(images):
     hashes = images_to_md5s(images)
     return find_duplicates(hashes)
 
+
 def dupes_check_all():
     names = ["balanced", "byclass", "bymerge", "digits", "letters", "mnist"]
     types = ["train", "test"]
@@ -131,13 +151,15 @@ def dupes_check_all():
             
             duplicates_i, dupe_x_y = dupes_check(images) 
             print(f"dupes..: {len(duplicates_i)}")
-            for i in dupe_x_y: dataset_img2(images, labels, i[0], i[1])
+            for i in dupe_x_y:
+                dataset_img2(images, labels, i[0], i[1])
+
 
 def dupes_rm(images, labels):
-    duplicates_i, _ = dupes_check(images) 
-    l = list(duplicates_i)
-    images = np.delete(images, l, axis=0)
-    labels = np.delete(labels, l, axis=0)
+    duplicates_i, _ = dupes_check(images)
+    duplicates_list = list(duplicates_i)
+    images = np.delete(images, duplicates_list, axis=0)
+    labels = np.delete(labels, duplicates_list, axis=0)
     return images, labels
     
 
@@ -208,14 +230,18 @@ def dataset_load(types: list):
 
     return total_images_nparr, total_labels_nparr, total_mappings
 
+
 def dataset_load_all():
     return dataset_load(["train", "test"])
+
 
 def dataset_load_train():
     return dataset_load(["train"])
 
+
 def dataset_load_test():
     return dataset_load(["test"])
+
 
 def save_XXp(images, labels, XX="80"):
     images_path = f'cache_unique_{XX}_images.npy'
@@ -224,6 +250,7 @@ def save_XXp(images, labels, XX="80"):
     print(f"saving: {labels_path} -- {labels.shape}")
     np.save(d_datasets(images_path), images)
     np.save(d_datasets(labels_path), labels)
+
 
 def load_XXp(XX="80"):
     cache_images_path = d_datasets(f"cache_unique_{XX}p_images.npy")
@@ -234,6 +261,7 @@ def load_XXp(XX="80"):
         print(f'loaded from cache -- {cache_images_path} -- images.: {images.shape} -- {bytes_human_readable(images.nbytes)}')
         print(f'loaded from cache -- {cache_labels_path} -- labels.: {labels.shape}')
         return images, labels
+
 
 def dataset_info():
     names = ["balanced", "byclass", "bymerge", "digits", "letters", "mnist"]
@@ -248,7 +276,3 @@ def dataset_info():
             print(f'class..: {len(mapping)}')
             print(f"bytes..: {bytes_human_readable(images.nbytes)}")
             print()
-
-
-
-

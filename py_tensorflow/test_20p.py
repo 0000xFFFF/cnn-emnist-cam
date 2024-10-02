@@ -1,21 +1,19 @@
 #!/usr/bin/env python3
 
 # %% libs
-from utils_main import *
-from utils_load import *
-from utils_tf import *
-from utils_selectmodel import selectmodel
-import time
+import gc
+from utils_tf import prepdata
+from utils_tf_selectmodel import selectmodel
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from emnist_load import load_XXp
+
 
 # %% select model
 
 model = selectmodel()
-
-# %% libs
-import pandas as pd
-from utils_main import *
-from utils_load import *
-from utils_tf import *
 
 # %% new model settings
 print("loading...")

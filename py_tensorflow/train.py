@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 
 # %% libs
+import gc
+import sys
+import os
 import pandas as pd
-from utils_main import *
-from utils_load import *
-from utils_tf import *
+from utils_tf import create_model, d_models, prepdata
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from emnist_load import dataset_load_all
+
 
 # %% new model settings
 print("creating model: ", end='')
-batch_size = 10000
-num_epochs = 5
+batch_size = 100
+num_epochs = 1
 model, name = create_model()
 file_name = f"all_{name}_batch{batch_size}_epoch{num_epochs}"
 model_name = f"{file_name}.keras"
@@ -39,4 +43,3 @@ print(f"saving model: {model_name}")
 model.save(d_models(model_name))
 pd.DataFrame(result.history).to_csv(d_models(f"{file_name}_history.csv"))
 print("model saved.")
-

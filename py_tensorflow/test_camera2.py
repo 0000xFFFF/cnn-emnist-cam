@@ -5,11 +5,16 @@
 import cv2
 import numpy as np
 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from emnist_maps import emnist_class_mapping_reversed
+
 # %% select model
 
-from utils_main import *
-from utils_selectmodel import selectmodel
-#model = selectmodel("all_v3_batch10000_epoch5.keras")
+from utils_tf_selectmodel import selectmodel
+
+# model = selectmodel("all_v3_batch10000_epoch5.keras")
 model = selectmodel()
 
 def text_detection(image, padding=3):
@@ -35,7 +40,6 @@ def text_detection(image, padding=3):
     # draw rects
     for (x, y, w, h) in text_regions:
         cv2.rectangle(imgcopy, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
 
     cv2.imshow("rect", imgcopy)
     return image, text_regions
@@ -73,6 +77,7 @@ if not vc.isOpened():
 # windows
 cv2.namedWindow("preview")
 
+
 def display_chars_old(chars):
     chars.reverse()
     if len(chars) >= 1:
@@ -83,12 +88,13 @@ def display_chars_old(chars):
         combined_image = np.hstack(resized_chars)
         cv2.imshow("Combined Characters", combined_image)
 
+
 def detect(chars):
     images = np.array(chars)
     print(images.shape, end=" -- ")
     predictions = model.predict(images, verbose=0)
     values = np.argmax(predictions, axis=1)
-    text = [reversed_class_mapping[i] for i in values]
+    text = [emnist_class_mapping_reversed[i] for i in values]
     print(text)
 
 
@@ -101,12 +107,13 @@ def display_chars1(chars):
     chars.reverse()
     if len(chars) >= 1:
         # Resize characters to have the same height
-        max_height = max(char.shape[0] for char in chars)
+        # max_height = max(char.shape[0] for char in chars)
         resized_chars = [resize_keep_channels(char) for char in chars]
 
         combined_image = np.hstack(resized_chars)
         cv2.imshow("Combined Characters", combined_image)
-        detect(resized_chars) 
+        detect(resized_chars)
+
 
 i = 0
 while True:
@@ -127,7 +134,7 @@ while True:
 
     key = cv2.waitKey(1)
 
-    if key == 27: # exit on ESC
+    if key == 27:  # exit on ESC
         print("Closing webcam preview.")
         break
 

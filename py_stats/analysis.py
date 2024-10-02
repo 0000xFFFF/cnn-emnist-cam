@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 
 # %% libs
-from utils_main import *
-from utils_load import *
+import os
+import sys
 import collections
 import pandas as pd
+import matplotlib.pyplot as plt
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from emnist_load import dataset_load_all, dataset_load_train, dataset_load_test
 
 # %% 
 
 print("Analyzing datasets...")
+
 
 def labels_to_counter(labels):
     counter = collections.Counter()
     for i in labels:
         counter.update(i)
     return counter
+
 
 def counter_to_df(counter, filename):
     df = pd.DataFrame.from_dict(counter, orient='index')
@@ -23,11 +29,12 @@ def counter_to_df(counter, filename):
     df.sort_values(by='count', inplace=True, ascending=False)
     df.reset_index(drop=True, inplace=True)
     df.index.name = 'index'
-    df.to_csv(d_stats(filename + ".txt"))
-    with open(d_stats(filename + "_stat.txt"), 'w') as file:
+    df.to_csv(filename + ".txt")
+    with open(filename + "_stat.txt", 'w') as file:
         file.write("sum     " + str(df['count'].sum()) + "\n")
         file.write(str(df['count'].describe()) + "\n")
     return df
+
 
 def counter_stat(load_func, set_type):
     print(f"{set_type}:")
@@ -62,7 +69,7 @@ def plot_dfs(total_df, train_df, test_df):
     ax2.bar(test_df2['character'], test_df2['count'], color="red", label="test")
     ax2.legend()
     plt.tight_layout(pad=2)
-    plt.savefig(d_stats("dataset_unqiue_count_all.png"), bbox_inches='tight', pad_inches=0.1)
+    plt.savefig("dataset_unqiue_count_all.png", bbox_inches='tight', pad_inches=0.1)
     #plt.show()
 
 plot_dfs(total_df, train_df, test_df)

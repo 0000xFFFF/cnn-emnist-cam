@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 
 # %% libs
-from utils_main import *
-from utils_load import *
-from utils_tf import *
-from utils_selectmodel import selectmodel
+from utils_tf_selectmodel import selectmodel
 import time
+import numpy as np
+
+import matplotlib.pyplot as plt
+from utils_tf import prepdata
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from emnist_load import dataset_loadset, dataset_img
+from emnist_maps import emnist_class_mapping_reversed
+
 
 # %% select model
 
@@ -29,7 +37,7 @@ print("done.")
 
 # %% find misses
 
-a_lst = np.array([reversed_class_mapping[i] for i in predicted_labels])
+a_lst = np.array([emnist_class_mapping_reversed[i] for i in predicted_labels])
 
 right = 0
 wrong = 0
@@ -60,7 +68,7 @@ print(image.shape)
 val = np.argmax(model.predict(image), axis=1)
 value = val[0]
 
-label = reversed_class_mapping[value]
+label = emnist_class_mapping_reversed[value]
 print("predict:", label)
 
 plt.figure()
