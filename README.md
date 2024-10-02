@@ -45,10 +45,10 @@ cd py_stats
 
 
 ## TensorFlow
-before running anything, setup the virtual environment:
+before running anything, setup the virtual environment with:
 ```sh
 cd py_tensorflow
-./setup-env.sh                     # will install all pip from requirements.txt
+./setup-env.sh
 source p3env/bin/activate
 ```
 
