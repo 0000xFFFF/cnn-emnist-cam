@@ -30,12 +30,9 @@ def get_charimgs():
     return charimgs
 
 
-def save_to_numpy(charimgs, prefix, output_dir='output'):
+def save_to_numpy(charimgs, prefix):
     images = []
     labels = []
-
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
 
     for k, v in charimgs.items():
         images.extend(v)
