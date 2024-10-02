@@ -37,17 +37,18 @@ if the script fails consider downloading the dataset manually:
 ## Analyse the downloaded set
 ```sh
 cd py_stats
-./analysis.py       # graph char counts - output: stats dir
+./analysis.py       # graph char counts
 ./checkdupes.py     # check for duplicates
-./grid.py           # make grid of some images - output: stats dir
+./grid.py           # draw grids for first couple of images
 ```
 ![char count image](py_stats/dataset_unqiue_count_all.png "character count")
 
 
 ## TensorFlow
+before running anything, setup the virtual environment:
 ```sh
 cd py_tensorflow
-./setup-env.sh
+./setup-env.sh                     # will install all pip from requirements.txt
 source p3env/bin/activate
 ```
 
