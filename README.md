@@ -48,7 +48,7 @@ cd py_stats
 before running anything, setup the virtual environment with:
 ```sh
 cd py_tensorflow
-./setup-env.sh
+./setup-venv.sh
 source p3env/bin/activate
 ```
 
@@ -95,7 +95,7 @@ multiple character detection, newer version (needs some work)
 # PyTorch
 ```sh
 cd py_torch
-./setup-env.sh
+./setup-venv.sh
 source p3env/bin/activate
 ```
 #### TODO: remake this proj in pytorch
